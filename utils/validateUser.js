@@ -8,4 +8,9 @@ const userSchema = Joi.object({
   place: Joi.string().required().min(2),
 });
 
-module.exports = userSchema;
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
+module.exports = { userSchema, loginSchema };

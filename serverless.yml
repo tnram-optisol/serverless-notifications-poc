@@ -61,6 +61,10 @@ plugins:
 #    - include-me-dir/**
 
 functions:
+  myAuthorizer:
+    timeout: 60
+    handler: Controller/user/authorizer.handler
+
   createUser:
     timeout: 60
     handler: Controller/user/registerUser.handler
@@ -68,6 +72,22 @@ functions:
       - http:
           method: post
           path: user/register
+  getUser:
+    timeout: 60
+    handler: Controller/user/getUser.handler
+    events:
+      - http:
+          method: get
+          path: user/{id}
+          authorizer: myAuthorizer
+  auth:
+    timeout: 60
+    handler: Controller/user/loginUser.handler
+    events:
+      - http:
+          method: post
+          path: auth/login
+          
   sendNotification:
     timeout: 60
     handler: Controller/notifications/sendNotification.handler
@@ -75,6 +95,7 @@ functions:
       - http:
           method: get
           path: notifications/{location}
+          authorizer: myAuthorizer
 
 
 # you can add CloudFormation resource templates here

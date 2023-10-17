@@ -1,19 +1,25 @@
 const userDao = require("../../database/daos/userDao");
 const User = require("../../database/entity/User");
 const { mongoConnect } = require("../../database/mongoConnect");
-const userSchema = require("../../utils/validateUser");
+const { generateHashPassword } = require("../../utils/helper/userHelper");
+const { userSchema } = require("../../utils/validateUser");
 
 async function registerUser(event, context) {
   try {
     await mongoConnect();
-    const user = JSON.parse(event.body);
+    let user = JSON.parse(event.body);
     const { err, data } = await userSchema.validateAsync(user);
 
-    await userDao.saveUser(user);
+    user = {
+      ...user,
+      password: await generateHashPassword(user.password),
+    };
+
+    const userData = await userDao.saveUser(user);
 
     return {
       statusCode: 201,
-      body: JSON.stringify({ message: "User Registered" }),
+      body: JSON.stringify({ message: "User Registered", userData }),
     };
   } catch (error) {
     if ("details" in error) {
